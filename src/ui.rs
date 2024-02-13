@@ -7,8 +7,8 @@ use ratatui::{
 
 use crate::{
     components::{
-        banner_block, definition_block, example_block, footer, part_of_speech_block, popup,
-        search_bar, synonym_block,
+        antonym_block, banner_block, definition_block, example_block, footer, part_of_speech_block,
+        popup, search_bar, synonym_block,
     },
     models::{
         app::{App, InputMode},
@@ -49,7 +49,7 @@ pub fn render(app: &mut App, f: &mut Frame) {
             if !app.results.is_empty() {
                 render_part_of_speech_block(app, f, lower_frame[0]);
                 render_right_frame_components(app, f, right_frame);
-                render_synonym_block(app, f, bottom_frame[0])
+                render_bottom_block(app, f, bottom_frame);
             } else {
                 f.render_widget(banner_block::new(), banner_frame[0]);
             }
@@ -116,9 +116,19 @@ fn create_bottom_layout(area: Rect) -> Rc<[Rect]> {
         .split(area)
 }
 
+fn render_bottom_block(app: &mut App, f: &mut Frame, bottom_frame: Rc<[Rect]>) {
+    render_synonym_block(app, f, bottom_frame[0]);
+    render_antonym_block(app, f, bottom_frame[1]);
+}
+
 fn render_synonym_block(app: &mut App, f: &mut Frame, area: Rect) {
     let mut cloned_state = app.synonym_list.state.clone();
     f.render_stateful_widget(synonym_block::new(app), area, &mut cloned_state);
+}
+
+fn render_antonym_block(app: &mut App, f: &mut Frame, area: Rect) {
+    let mut cloned_state = app.antonym_list.state.clone();
+    f.render_stateful_widget(antonym_block::new(app), area, &mut cloned_state);
 }
 
 fn render_right_frame_components(app: &mut App, f: &mut Frame, right_frame: Rc<[Rect]>) {

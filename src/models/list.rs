@@ -5,6 +5,7 @@ pub enum StatefulListType {
     PartOfSpeech,
     Definition,
     Synonym,
+    Antonym,
     All,
 }
 
@@ -33,7 +34,11 @@ impl<T> StatefulList<T> {
     pub fn down(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
-                if i >= self.items.len() - 1 { 0 } else { i + 1 }
+                if i >= self.items.len() - 1 {
+                    0
+                } else {
+                    i + 1
+                }
             }
             None => 0,
         };
@@ -43,7 +48,11 @@ impl<T> StatefulList<T> {
     pub fn up(&mut self) {
         let i = match self.state.selected() {
             Some(i) => {
-                if i == 0 { self.items.len() - 1 } else { i - 1 }
+                if i == 0 {
+                    self.items.len() - 1
+                } else {
+                    i - 1
+                }
             }
             None => 0,
         };

@@ -84,18 +84,21 @@ fn main() -> Result<()> {
                     KeyCode::Enter => {
                         app.input_mode = InputMode::SelectDefinition;
                         App::update_stateful_lists(&mut app, list::StatefulListType::Definition);
-                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym)
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym);
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Antonym);
                     }
                     _ => {}
                 },
                 InputMode::SelectDefinition => match key.code {
                     KeyCode::Char('l') => {
                         app.definition_list.down();
-                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym)
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym);
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Antonym);
                     }
                     KeyCode::Char('h') => {
                         app.definition_list.up();
-                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym)
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Synonym);
+                        App::update_stateful_lists(&mut app, list::StatefulListType::Antonym);
                     }
                     KeyCode::Char('q') => {
                         app.input_mode = InputMode::Normal;

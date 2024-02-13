@@ -34,6 +34,7 @@ pub struct App {
     pub is_spelling_fix_enabled: bool,
     pub suggested_spelling: String,
     pub synonym_list: StatefulList<String>,
+    pub antonym_list: StatefulList<String>,
 }
 
 impl App {
@@ -73,10 +74,14 @@ impl App {
             StatefulListType::Synonym => {
                 self.update_synonym_list();
             }
+            StatefulListType::Antonym => {
+                self.update_antonym_list();
+            }
             _ => {
                 self.update_part_of_speech_list();
                 self.update_definition_list();
                 self.update_synonym_list();
+                self.update_antonym_list();
             }
         }
     }
@@ -122,22 +127,34 @@ impl App {
 
     fn update_synonym_list(&mut self) {
         if !self.results.is_empty() {
-            if let Some(pos_idx) = self.part_of_speech_list.state.selected() {
-                let definitions = Thesaurus::unwrap_meanings_at(pos_idx, &self.results[0]).1;
-                if let Some(def_idx) = self.definition_list.state.selected() {
-                    let definition = &definitions[def_idx];
-                    let synonyms = definition.clone().synonyms;
-                    {
-                        if synonyms.is_some() {
-                            let synonyms: Vec<String> =
-                                synonyms.unwrap().iter().map(|i| i.clone()).collect();
-                            self.synonym_list =
-                                StatefulList::with_items(synonyms, StatefulListType::Synonym);
-                        }
-                    }
-                }
-            };
+            let pos_idx = self.part_of_speech_list.state.selected().unwrap_or(0);
+            let def_idx = self.definition_list.state.selected().unwrap_or(0);
+            let synonyms = self.unwrap_definition(pos_idx, def_idx).0;
+            if synonyms.len() > 0 {
+                let synonyms: Vec<String> = synonyms.iter().map(|i| i.clone()).collect();
+                self.synonym_list = StatefulList::with_items(synonyms, StatefulListType::Synonym);
+            }
+        };
+    }
+
+    fn update_antonym_list(&mut self) {
+        if !self.results.is_empty() {
+            let pos_idx = self.part_of_speech_list.state.selected().unwrap_or(0);
+            let def_idx = self.definition_list.state.selected().unwrap_or(0);
+            let antonyms = self.unwrap_definition(pos_idx, def_idx).1;
+            if antonyms.len() > 0 {
+                let antonyms: Vec<String> = antonyms.iter().map(|i| i.clone()).collect();
+                self.antonym_list = StatefulList::with_items(antonyms, StatefulListType::Antonym);
+            }
         }
+    }
+
+    fn unwrap_definition(&mut self, pos_idx: usize, def_idx: usize) -> (Vec<String>, Vec<String>) {
+        let definitions = Thesaurus::unwrap_meanings_at(pos_idx, &self.results[0]).1;
+        let definition = &definitions[def_idx];
+        let synonyms = definition.clone().synonyms.unwrap_or(vec!["".to_string()]);
+        let antonyms = definition.clone().antonyms.unwrap_or(vec!["".to_string()]);
+        (synonyms, antonyms)
     }
 }
 
